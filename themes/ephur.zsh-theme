@@ -187,17 +187,30 @@ prompt_battery_pct() {
 }
 
 
-## Main prompt
-build_prompt() {
-  RETVAL=$?
-  prompt_status
-  prompt_battery_pct
-  prompt_virtualenv
-  prompt_context
-  prompt_dir
-  prompt_git
-  prompt_hg
-  prompt_end
-}
+## Main prompt - only display battery on OSX machines
+if [ `uname -s` = 'Darwin' ]; then
+  build_prompt() {
+    RETVAL=$?
+    prompt_status
+    prompt_battery_pct
+    prompt_virtualenv
+    prompt_context
+    prompt_dir
+    prompt_git
+    prompt_hg
+    prompt_end
+  }
+else 
+  build_prompt() {
+    RETVAL=$?
+    prompt_status
+    prompt_virtualenv
+    prompt_context
+    prompt_dir
+    prompt_git
+    prompt_hg
+    prompt_end
+  }
+fi
 
 PROMPT='%{%f%b%k%}$(build_prompt) '
