@@ -40,6 +40,7 @@ local exit_code="%(?,%?,%{$fg[red]%}%?%{$reset_color%})"
 # Prompt format:
 #
 # PRIVILEGES USER @ MACHINE in DIRECTORY on git:BRANCH STATE [TIME] tty:$TTY L:$SHELL_LEVEL N:LINE_NUM C:LAST_EXIT_CODE
+=======
 # $ COMMAND
 #
 # For example:
