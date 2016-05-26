@@ -170,7 +170,7 @@ prompt_status() {
 prompt_battery_pct() {
   local pct=$(battery_pct_remaining)
   local color
-  if [ ${pct} = "External" ]; then
+  if [ "${pct}" = "External Power" -o "${pct}" = "External" ]; then
     color='green'
     pct='∞' 
   elif [ ${pct} -gt 50 ]; then 
