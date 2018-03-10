@@ -3,7 +3,8 @@
 # If no highlighting method supported for given extension then it tries 
 # guess it by looking for file content.
 
-alias colorize='colorize_via_pygmentize'
+#easier alias to use plugin
+alias ccat='colorize_via_pygmentize'
 
 colorize_via_pygmentize() {
     if [ ! -x $(which pygmentize | awk ' { print $(NF) } ') ]; then
