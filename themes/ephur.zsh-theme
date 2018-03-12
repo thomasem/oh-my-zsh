@@ -5,8 +5,8 @@
 #   Powerline-inspired theme for ZSH
 #
 # Requirements
-#   A powerline patched font 
-#   Solarized colors look best as in agnosters original theme 
+#   A powerline patched font
+#   Solarized colors look best as in agnosters original theme
 #   Oh My ZSH Plugins Used by me:
 #     git
 #     gem
@@ -26,7 +26,7 @@
 #     virtualenv
 #     git-remote-branch
 #     battery
-# 
+#
 
 ### Segment drawing
 # A few utility functions to make it easy and re-usable to draw segmented prompts
@@ -73,6 +73,7 @@ prompt_context() {
     prompt_segment black default "%(!.%{%F{yellow}%}.)$user@%m"
   fi
 }
+  prompt_segment default default " )"
 
 # Git: branch/detached head, dirty status
 prompt_git() {
@@ -144,10 +145,10 @@ prompt_dir() {
 # Virtualenv: current working virtualenv
 prompt_virtualenv() {
   local virtualenv_path="$VIRTUAL_ENV"
-  if [[ -n $virtualenv_path && 
-      ( -z $VIRTUAL_ENV_DISABLE_PROMPT || 
-        ( -n $VIRTUAL_ENV_DISABLE_PROMPT && 
-          -n $VIRTUAL_ENV_DISABLE_PROMPT_BY_PLUGIN ) 
+  if [[ -n $virtualenv_path &&
+      ( -z $VIRTUAL_ENV_DISABLE_PROMPT ||
+        ( -n $VIRTUAL_ENV_DISABLE_PROMPT &&
+          -n $VIRTUAL_ENV_DISABLE_PROMPT_BY_PLUGIN )
       ) ]]; then
     prompt_segment blue black "(`basename $virtualenv_path`)"
   fi
@@ -173,8 +174,8 @@ prompt_battery_pct() {
   local color
   if [ "${pct}" = "External Power" -o "${pct}" = "External" ]; then
     color='green'
-    pct='∞' 
-  elif [ ${pct} -gt 50 ]; then 
+    pct='∞'
+  elif [ ${pct} -gt 50 ]; then
     color='green'
     pct="${pct}%%"
   elif [ ${pct} -gt 25 ]; then
@@ -183,10 +184,32 @@ prompt_battery_pct() {
   else
     color='red'
     pct="DANGER:${pct}%%"
-  fi 
+  fi
   prompt_segment ${color} default ${pct}
 }
 
+prompt_python_version() {
+  local pyversion=`python --version 2>&1 | awk ' { print ($NF)}'`
+  prompt_segment ${1} ${2} "python: ${pyversion}"
+}
+
+prompt_k8s_context() {
+  local context=`kubectl config current-context`
+  prompt_segment ${1} ${2} "k8s ctx: ${context}"
+}
+
+prompt_k8s_namespace() {
+  local namespace=`kubectl config get-contexts minikube | awk ' { print $(5) }' | tail -1`
+  if [ "${namespace}" = "" ]; then
+    namespace='default'
+  fi
+  prompt_segment ${1} ${2} "k8s spc: ${namespace}"
+}
+
+prompt_go_version() {
+  local goversion=`go version | awk ' { print $3}'`
+  prompt_segment ${1} ${2} "go: ${goversion/go/}"
+}
 
 ## Main prompt - only display battery on OSX machines
 if [ `uname -s` = 'Darwin' ]; then
@@ -201,7 +224,7 @@ if [ `uname -s` = 'Darwin' ]; then
     prompt_hg
     prompt_end
   }
-else 
+else
   build_prompt() {
     RETVAL=$?
     prompt_status
@@ -214,4 +237,15 @@ else
   }
 fi
 
-PROMPT='%{%f%b%k%}$(build_prompt) '
+build_header() {
+  local c1=024
+  local c2=136
+  prompt_python_version ${c1} ${c2}
+  prompt_go_version ${c2} ${c1}
+  prompt_k8s_context ${c1} ${c2}
+  prompt_k8s_namespace ${c2} ${c1}
+  prompt_end
+}
+
+PROMPT='$(build_header)
+%{%f%b%k%}$(build_prompt) '
